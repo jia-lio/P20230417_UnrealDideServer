@@ -15,18 +15,26 @@ AP20230412GameMode::AP20230412GameMode()
 	}
 
 	
+	
+}
+
+void AP20230412GameMode::StartPlay()
+{
+
+
+
 }
 
 void AP20230412GameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	if (NewPlayer->HasClientLoadedCurrentWorld())
-	{
-		NewPlayer->AcknowledgePossession(NewPlayer->GetPawn());
-		NewPlayer->ClientMessage(FString::Printf(TEXT("어서와 데디서버에")));
-		UE_LOG(LogTemp, Warning, TEXT("드루갓다"));
-	}
+	//if (NewPlayer->HasClientLoadedCurrentWorld())
+	//{
+	//	NewPlayer->AcknowledgePossession(NewPlayer->GetPawn());
+	//	NewPlayer->ClientMessage(FString::Printf(TEXT("어서와 데디서버에")));
+	//	UE_LOG(LogTemp, Warning, TEXT("클라이언트가 드루왓다"));
+	//}
+
+	UE_LOG(LogTemp, Warning, TEXT("클라이언트가 드루왓다"));
 }
-
-
