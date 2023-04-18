@@ -8,7 +8,14 @@ public class P20230412 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        //20230417 Sockets Networking 추가
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "HTTP" });
+		//20230417 HTTP 추가
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{ 
+			"Core", "CoreUObject", "Engine", "InputCore", 
+			"HeadMountedDisplay", "EnhancedInput", "HTTP"
+            
+
+        });
+
 	}
 }

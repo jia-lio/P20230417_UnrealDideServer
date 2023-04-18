@@ -65,4 +65,6 @@ void ALoginGameMode::OnPostLogin(AController* NewPlayer)
 		UE_LOG(LogTemp, Warning, TEXT("이거아니래"));
 	}*/
 
+
 }
+

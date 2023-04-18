@@ -13,7 +13,14 @@ class AP20230412GameMode : public AGameModeBase
 
 public:
 	AP20230412GameMode();
-	virtual void PostLogin(APlayerController* NewPlayer);
+	
+	virtual void StartPlay() override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	
+private:
+	class FSocket* Socket;
+
 };
 
 
