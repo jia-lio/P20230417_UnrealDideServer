@@ -21,7 +21,7 @@ int main()
 	SOCKADDR_IN TCPServerSocketAddr;	//소켓 주소 구조체 만들기
 	memset(&TCPServerSocketAddr, NULL, sizeof(TCPServerSocketAddr));	//초기화
 	TCPServerSocketAddr.sin_family = AF_INET;				//IPv4
-	TCPServerSocketAddr.sin_port = 10000;					//port
+	TCPServerSocketAddr.sin_port = htons(10000);			//port
 	TCPServerSocketAddr.sin_addr.s_addr = INADDR_ANY;		//모두 수신
 
 	//socket 연결

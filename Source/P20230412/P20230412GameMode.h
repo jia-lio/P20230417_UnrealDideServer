@@ -14,7 +14,6 @@ class AP20230412GameMode : public AGameModeBase
 public:
 	AP20230412GameMode();
 	
-	virtual void StartPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	
