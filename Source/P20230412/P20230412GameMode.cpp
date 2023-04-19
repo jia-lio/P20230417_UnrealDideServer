@@ -4,6 +4,9 @@
 #include "P20230412Character.h"
 #include "TestPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
+#include "FTestThread.h"
+
+#include <string>
 
 AP20230412GameMode::AP20230412GameMode()
 {
@@ -18,12 +21,7 @@ AP20230412GameMode::AP20230412GameMode()
 	
 }
 
-void AP20230412GameMode::StartPlay()
-{
 
-
-
-}
 
 void AP20230412GameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -37,4 +35,8 @@ void AP20230412GameMode::PostLogin(APlayerController* NewPlayer)
 	//}
 
 	UE_LOG(LogTemp, Warning, TEXT("클라이언트가 드루왓다"));
+
+	FTestThread* Sender = new FTestThread(FString::Printf(TEXT("%i"), GetNumPlayers()));
+	//FTestThread* Sender = new FTestThread(TEXT("d"));
+	FRunnableThread* Thread = FRunnableThread::Create(Sender, TEXT("SendThread"));
 }
