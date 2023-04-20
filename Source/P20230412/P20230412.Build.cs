@@ -8,9 +8,9 @@ public class P20230412 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		//20230417 HTTP 추가
-		//20230419
-		PublicDependencyModuleNames.AddRange(new string[] 
+        //20230417 HTTP 추가
+        //20230419 Networking
+        PublicDependencyModuleNames.AddRange(new string[] 
 		{ 
 			"Core", "CoreUObject", "Engine", "InputCore", 
 			"HeadMountedDisplay", "EnhancedInput", "HTTP",

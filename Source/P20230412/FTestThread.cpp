@@ -4,9 +4,13 @@
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "IPAddress.h"
 
+#include "USingleton.h"
+
+
+
 FTestThread::FTestThread()
 {
-
+	
 }
 
 FTestThread::FTestThread(const FString& m) : Message(m)
@@ -62,24 +66,30 @@ uint32 FTestThread::Run()
 		if (DediServerSocket->GetConnectionState() != ESocketConnectionState::SCS_Connected) break;
 
 		//받아온 메세지를 uint8 데이터로 변환
-		FString MessageToSend = FString::Printf(TEXT("%s\n"), *Message);
+		FString MessageToSend = FString::FromInt(UUSingleton::GetInstance()->GetData().PlayerNum);	//int > fstring변환
+		MessageToSend += FString::FromInt(UUSingleton::GetInstance()->GetData().ServerPort);
+
+		MessageToSend += UUSingleton::GetInstance()->GetData().IP;
+
 		uint8* Data = (uint8*)TCHAR_TO_UTF8(*MessageToSend);
 		int32 BytesSent = 0;
 
 		if (DediServerSocket->GetConnectionState() == ESocketConnectionState::SCS_Connected)
 		{
-			DediServerSocket->Send(Data, sizeof(Data), BytesSent);	//데이터전송
+			DediServerSocket->Send(Data, MessageToSend.Len(), BytesSent);
+			//DediServerSocket->Send(Data, sizeof(Data), BytesSent);	//데이터전송
 			bRunThread = false;
 		}
 
 
-		FPlatformProcess::Sleep(0.1f);	//스레드를 잠시 멈춘다
+
+		FPlatformProcess::Sleep(2.0f);	//스레드를 잠시 멈춘다
 		//정보를 보냈으니 스레드 종료
-		if (!bRunThread)
-		{
-			this->Stop();
-			break;
-		}
+		//if (!bRunThread)
+		//{
+		//	this->Stop();
+		//	break;
+		//}
 	}
 
 	return 0;
@@ -91,3 +101,4 @@ void FTestThread::Stop()
 	
 	UE_LOG(LogTemp, Warning, TEXT("스레드 종료."));
 }
+
