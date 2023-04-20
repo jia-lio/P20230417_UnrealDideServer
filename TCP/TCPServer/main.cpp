@@ -81,6 +81,7 @@ int main()
 						}
 						else
 						{	//데이터를 수신했으니 정보를 말해줌
+							Buffer[RecvBytes] = '\0';	//버퍼의 마지막에 null추가
 							cout << "TCP : " << Buffer << endl;
 						}
 					}

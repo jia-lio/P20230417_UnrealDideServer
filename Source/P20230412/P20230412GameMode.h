@@ -15,10 +15,8 @@ public:
 	AP20230412GameMode();
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	
-private:
-	class FSocket* Socket;
 
 };
 
