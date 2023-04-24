@@ -2,6 +2,15 @@
 
 #include "CoreMinimal.h"
 
+#pragma pack(push, 1)
+struct MyData
+{
+	uint16_t PlayerNum;
+	uint16_t ServerPort;
+	char IP[16];
+};
+#pragma pack(pop)
+
 class P20230412_API FTestThread : public FRunnable
 {
 public:
