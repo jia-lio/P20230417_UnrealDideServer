@@ -65,23 +65,37 @@ uint32 FTestThread::Run()
 		//소켓과 연결이 끊어지면 종료
 		if (DediServerSocket->GetConnectionState() != ESocketConnectionState::SCS_Connected) break;
 
-		//받아온 메세지를 uint8 데이터로 변환
-		FString MessageToSend = FString::FromInt(UUSingleton::GetInstance()->GetData().PlayerNum);	//int > fstring변환
-		MessageToSend += FString::FromInt(UUSingleton::GetInstance()->GetData().ServerPort);
+		////받아온 메세지를 uint8 데이터로 변환
+		//FString MessageToSend = FString::FromInt(UUSingleton::GetInstance()->GetData().PlayerNum);	//int > fstring변환
+		//MessageToSend += FString::FromInt(UUSingleton::GetInstance()->GetData().ServerPort);
+		//MessageToSend += UUSingleton::GetInstance()->GetData().IP;
 
-		MessageToSend += UUSingleton::GetInstance()->GetData().IP;
+		//uint8* Data = (uint8*)TCHAR_TO_UTF8(*MessageToSend);
+		//int32 BytesSent = 0;
 
-		uint8* Data = (uint8*)TCHAR_TO_UTF8(*MessageToSend);
-		int32 BytesSent = 0;
+		//if (DediServerSocket->GetConnectionState() == ESocketConnectionState::SCS_Connected)
+		//{
+		//	DediServerSocket->Send(Data, MessageToSend.Len(), BytesSent);
+		//	//DediServerSocket->Send(Data, sizeof(Data), BytesSent);	//데이터전송
+		//	bRunThread = false;
+		//}
 
+		//20230424 받아온 메세지를 Mydata 구조체에 저장하고 구조체를 전송
+		MyData data;
+		data.PlayerNum = UUSingleton::GetInstance()->GetData().PlayerNum;
+		data.ServerPort = UUSingleton::GetInstance()->GetData().ServerPort;
+		//FString 변수에 저장된 IP 를 char 로 변환하고 strncpy_s 함수를 사용해 char 배열에 복사
+		strncpy_s(data.IP, sizeof(data.IP), TCHAR_TO_ANSI(*UUSingleton::GetInstance()->GetData().IP), _TRUNCATE);
+		//패킹된 데이터를 보내기 위해 uint8 배열에 복사
+		uint8_t buffer[sizeof(MyData)];
+		memcpy(buffer, &data, sizeof(MyData));
+		//데이터 전송
+		int32 bytesSent = 0;
 		if (DediServerSocket->GetConnectionState() == ESocketConnectionState::SCS_Connected)
 		{
-			DediServerSocket->Send(Data, MessageToSend.Len(), BytesSent);
-			//DediServerSocket->Send(Data, sizeof(Data), BytesSent);	//데이터전송
+			DediServerSocket->Send(buffer, sizeof(MyData), bytesSent);
 			bRunThread = false;
 		}
-
-
 
 		FPlatformProcess::Sleep(2.0f);	//스레드를 잠시 멈춘다
 		//정보를 보냈으니 스레드 종료

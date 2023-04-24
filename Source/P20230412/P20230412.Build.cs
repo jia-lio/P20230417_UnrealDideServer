@@ -8,15 +8,22 @@ public class P20230412 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        //20230417 HTTP 추가
+        //20230417 HTTP
         //20230419 Networking
+		//20230424 UMG
         PublicDependencyModuleNames.AddRange(new string[] 
 		{ 
 			"Core", "CoreUObject", "Engine", "InputCore", 
 			"HeadMountedDisplay", "EnhancedInput", "HTTP",
-            "Sockets", "Networking"
+            "Sockets", "Networking", "UMG"
 
         });
 
-	}
+        //20230424
+        PrivateDependencyModuleNames.AddRange(new string[] 
+        {
+            "Slate", "SlateCore" 
+        });
+
+    }
 }
