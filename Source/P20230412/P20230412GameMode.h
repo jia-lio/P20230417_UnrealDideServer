@@ -14,9 +14,12 @@ class AP20230412GameMode : public AGameModeBase
 public:
 	AP20230412GameMode();
 	
+	virtual void InitGameState() override;
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	void InforThread();
 
 };
 

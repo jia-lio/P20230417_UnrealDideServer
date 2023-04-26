@@ -80,30 +80,42 @@ uint32 FTestThread::Run()
 		//	bRunThread = false;
 		//}
 
-		//20230424 받아온 메세지를 Mydata 구조체에 저장하고 구조체를 전송
-		MyData data;
-		data.PlayerNum = UUSingleton::GetInstance()->GetData().PlayerNum;
-		data.ServerPort = UUSingleton::GetInstance()->GetData().ServerPort;
-		//FString 변수에 저장된 IP 를 char 로 변환하고 strncpy_s 함수를 사용해 char 배열에 복사
-		strncpy_s(data.IP, sizeof(data.IP), TCHAR_TO_ANSI(*UUSingleton::GetInstance()->GetData().IP), _TRUNCATE);
-		//패킹된 데이터를 보내기 위해 uint8 배열에 복사
-		uint8_t buffer[sizeof(MyData)];
-		memcpy(buffer, &data, sizeof(MyData));
-		//데이터 전송
-		int32 bytesSent = 0;
-		if (DediServerSocket->GetConnectionState() == ESocketConnectionState::SCS_Connected)
-		{
-			DediServerSocket->Send(buffer, sizeof(MyData), bytesSent);
-			bRunThread = false;
-		}
+		bTest = UUSingleton::GetInstance()->GetBool();
 
-		FPlatformProcess::Sleep(2.0f);	//스레드를 잠시 멈춘다
-		//정보를 보냈으니 스레드 종료
-		//if (!bRunThread)
-		//{
-		//	this->Stop();
-		//	break;
-		//}
+		if (bTest)
+		{
+			//20230424 받아온 메세지를 Mydata 구조체에 저장하고 구조체를 전송
+			MyData data;
+			data.MyServer = (int)1;
+			data.PlayerNum = UUSingleton::GetInstance()->GetData().PlayerNum;
+			data.ServerPort = UUSingleton::GetInstance()->GetData().ServerPort;
+
+			UE_LOG(LogTemp, Warning, TEXT("Thread Port : %d"), UUSingleton::GetInstance()->GetData().ServerPort);
+			UE_LOG(LogTemp, Warning, TEXT("Thread IP : %s"), *UUSingleton::GetInstance()->GetData().IP);
+
+			//FString 변수에 저장된 IP 를 char 로 변환하고 strncpy_s 함수를 사용해 char 배열에 복사
+			strncpy_s(data.IP, sizeof(data.IP), TCHAR_TO_ANSI(*UUSingleton::GetInstance()->GetData().IP), _TRUNCATE);
+			//패킹된 데이터를 보내기 위해 uint8 배열에 복사
+			uint8_t buffer[sizeof(MyData)];
+			memcpy(buffer, &data, sizeof(MyData));
+			//데이터 전송
+			int32 bytesSent = 0;
+			if (DediServerSocket->GetConnectionState() == ESocketConnectionState::SCS_Connected)
+			{
+				DediServerSocket->Send(buffer, sizeof(MyData), bytesSent);
+				
+				UUSingleton::GetInstance()->SerBool(false);
+				bTest = false;
+			}
+
+			FPlatformProcess::Sleep(0.1f);	//스레드를 잠시 멈춘다
+			//정보를 보냈으니 스레드 종료
+			//if (!bRunThread)
+			//{
+			//	this->Stop();
+			//	break;
+			//}
+		}
 	}
 
 	return 0;

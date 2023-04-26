@@ -5,7 +5,8 @@
 #pragma pack(push, 1)
 struct MyData
 {
-	uint16_t PlayerNum;
+	int MyServer;
+	int PlayerNum;
 	uint16_t ServerPort;
 	char IP[16];
 };
@@ -30,5 +31,6 @@ private:
 	class FRunnableThread* thread;
 
 	bool bRunThread = false;
+	bool bTest = false;
 };
  

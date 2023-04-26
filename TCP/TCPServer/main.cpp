@@ -1,9 +1,12 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <iostream>
-#include <WinSock2.h>
 
+//---C
+#include <WinSock2.h>
+//---C++
+#include <iostream>
+//---Plugin Library
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
@@ -11,7 +14,7 @@ using namespace std;
 #pragma pack(push, 1)
 struct MyData
 {
-	uint16_t PlayerNum;
+	int PlayerNum;
 	uint16_t ServerPort;
 	char IP[16];
 };
@@ -76,7 +79,8 @@ int main()
 					else
 					{
 						char Buffer[1024] = { 0, };
-						int RecvBytes = recv(ReadSockets.fd_array[i], Buffer, sizeof(Buffer), 0);
+						int RecvBytes = recv(ReadSockets.fd_array[i], Buffer, sizeof(int), 0);
+						Buffer[RecvBytes] = '\0';	//버퍼의 마지막에 null추가
 						if (RecvBytes == 0)	//데이터를 수신하지 않음
 						{
 							closesocket(ReadSockets.fd_array[i]);
@@ -89,22 +93,42 @@ int main()
 							FD_CLR(ReadSockets.fd_array[i], &ReadSockets);
 						}
 						else
-						{	//데이터를 수신했으니 정보를 말해줌
-							Buffer[RecvBytes] = '\0';	//버퍼의 마지막에 null추가
-							MyData data;
-							memcpy(&data, Buffer, sizeof(MyData));
-							cout << "PlayerNum : " << data.PlayerNum << endl;
-							cout << "ServerPort : " << data.ServerPort << endl;
-							cout << "IP : " << data.IP << endl;
+						{
+							int number;
+							memcpy(&number, Buffer, sizeof(int));
+							//20230426 받은 데이터 : 서버
+							if (number == 1)
+							{
+								char DediServerBuffer[1024] = { 0, };  
+								int DediServerRecvBytes = recv(ReadSockets.fd_array[i], DediServerBuffer, sizeof(DediServerBuffer), 0);
+								DediServerBuffer[DediServerRecvBytes] = '\0';	//버퍼의 마지막에 null추가
+								MyData data;
+								memcpy(&data, DediServerBuffer, sizeof(MyData));
+								cout << "PlayerNum : " << data.PlayerNum << endl;
+								cout << "ServerPort : " << data.ServerPort << endl;
+								cout << "IP : " << data.IP << endl;
+
+								//20230426 DB연결
+								
+
+
+							}
+							//20230426 받은 데이터 : 클라
+							else
+							{
+								//1. db에서 포트번호랑 ip 받기
+								//2. 받은 정보를 클라에 넘겨주기
+
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	closesocket(TCPServerSocket);		//소켓삭제
 	WSACleanup();	//해제
-	
+
 	return 0;
 }

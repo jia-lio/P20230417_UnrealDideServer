@@ -2,6 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
+#include "Components/EditableText.h"
+#include "Json.h"
+#include "HttpModule.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+
 #include "TestLoginWidget.generated.h"
 
 UCLASS()
@@ -20,7 +27,7 @@ public:
 	FString Pass_UMG;
 
 	UFUNCTION(BlueprintCallable)
-	void TestID();
+	void OnLoginButtonClicked();
 
 	UFUNCTION(BlueprintCallable)
 	void TestPass();

@@ -26,6 +26,9 @@ public:
 	const Data& GetData() { return data; }
 	void SetData(int playernum, int serverport, FString ip);
 
+	bool GetBool() const { return singletonbool; }
+	void SerBool(bool val) { singletonbool = val; }
+
 private:
 	UUSingleton()
 	{
@@ -35,6 +38,7 @@ private:
 	static TSubclassOf<UUSingleton> SingletonClass;
 
 	Data data;
+	bool singletonbool;
 };
 
 UUSingleton* UUSingleton::instance = NULL;	//싱글톤 초기화
