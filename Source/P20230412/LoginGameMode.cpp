@@ -88,5 +88,26 @@ void ALoginGameMode::ClientTCPInfo()
 		ClientSocket->Send(buffer, sizeof(int), bytesSent);
 	}
 
+
+	//아래부터 멈추는듯? 
+	struct ServerData
+	{
+		uint16_t ServerPort;
+		FString IP;
+	};
+	ServerData SData;
+	uint8_t DBBuffer[1024] = { 0, };
+	int32 bytes = 0;
+	if (ClientSocket->Recv(DBBuffer, sizeof(DBBuffer), bytes))
+	{
+		memcpy(&SData, DBBuffer, sizeof(ServerData));
+		//UE_LOG(LogTemp, Warning, TEXT("Client Port : %d"), SData.IP);
+		//UE_LOG(LogTemp, Warning, TEXT("Client IP : %s"), SData.ServerPort);
+
+		//FString ServerAddress = "127.0.0.1:7777";	//주소
+		GetWorld()->GetFirstPlayerController()->ClientTravel(SData.IP, TRAVEL_Absolute);
+	}
+
+
 }
 

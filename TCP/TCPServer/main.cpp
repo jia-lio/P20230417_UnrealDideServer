@@ -1,17 +1,30 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
-
 //---C
 #include <WinSock2.h>
 //---C++
 #include <iostream>
-#include <mysql.h>
+#include <string.h>
+#include <jdbc/mysql_connection.h>
+#include <jdbc/cppconn/driver.h>
+#include <jdbc/cppconn/exception.h>
+#include <jdbc/cppconn/prepared_statement.h>
 //---Plugin Library
 #pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "libmysql.lib")
+#pragma comment(lib, "vs14/mysqlcppconn.lib")
 
 using namespace std;
+
+const string DBIP = "192.168.0.15:3306";					//MySQL IP
+const string DBID = "sihoon";								//MySQL ID
+const string DBPass = "qwer1234";							//MySQL Pass
+sql::Driver* DB_Driver = nullptr;							//MySQL 드라이버
+sql::Connection* DB_Connection = nullptr;					//MySQL 데이터베이스 연결
+sql::Statement* DB_Statement = nullptr;						//MySQL 데이터베이스에 대한 SQL 을 실행하는데 사용
+sql::PreparedStatement* DB_PreparedStatement = nullptr;		//MySQL 데이터베이스에 미리 컴파일된 SQL 을 실행하는데 사용
+sql::ResultSet* DB_ResultSet = nullptr;						//MySQL 데이터베이스에서 반환된 결과 집합
+
 
 #pragma pack(push, 1)
 struct MyData
@@ -22,16 +35,72 @@ struct MyData
 };
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+struct DBInfoData
+{
+	uint16_t ServerPort;
+	char IP[16];
+};
+#pragma pack(pop)
+
+void SendToDB(sql::Statement* _statement, string IPAddr, int PortNum, int PlayerNum)
+{
+	// DB에 입력될 데이터 값
+	string IP = IPAddr;
+	string stringPort = to_string(PortNum);
+	string stringPlayerNumber = to_string(PlayerNum);
+
+	// 쿼리문 세팅
+	string query = "INSERT INTO server_list (ip_address, port_number, player_number) VALUES ('" + IP + "', " + stringPort + ", " + stringPlayerNumber + ") ON DUPLICATE KEY UPDATE player_number=" + stringPlayerNumber + ";";
+
+	try
+	{
+		// 쿼리문 날리기
+		_statement->execute(query);
+	}
+	catch (sql::SQLException err)
+	{
+		cout << "DB Send Error" << endl;
+		exit(-2);
+	}
+}
+
+void ReceiveFromDB(sql::Statement* _statement, sql::ResultSet*& _resultset)
+{
+	// 쿼리문 세팅
+	string query = "SELECT * from server_list";
+
+	try {
+		// 실행하고 결과 받아오는게 있을 때 executeQuery 사용하자(결과값은 ResultSet* 타입이다)
+		_resultset = _statement->executeQuery(query);
+	}
+	catch (sql::SQLException err)
+	{
+		cout << "DB Receive Error" << endl;
+	}
+
+}
+
+
 int main()
 {
 	//---MySQL
-	MYSQL mysql;
-	mysql_init(&mysql);
-	if(!mysql_real_connect(&mysql, "192.168.0.15:3306", "sihoon", "qwer1234",)
-
+	try
+	{
+		DB_Driver = get_driver_instance();	//mysql 드라이버를 가져와서 연결
+		DB_Connection = DB_Driver->connect(DBIP, DBID, DBPass);	//데이터베이스 접속
+		DB_Connection->setSchema("server_info");
+		DB_Statement = DB_Connection->createStatement();
+		cout << "--->DB" << endl;
+	}
+	catch (sql::SQLException e)
+	{
+		cout << "--->NOT DB" << endl;
+		return -1;
+	}
 
 	//---WinSock
-	//WSAData wsaData;
+	WSAData wsaData;
 
 	int Result = WSAStartup(MAKEWORD(2, 2), &wsaData);		//winsock 초기화
 	if (Result != 0) { cout << "WinSock2 Error"; return -1; }	//초기화 안되면 에러처리
@@ -46,7 +115,8 @@ int main()
 	TCPServerSocketAddr.sin_addr.s_addr = INADDR_ANY;		//모두 수신
 
 	//socket 연결
-	Result = bind(TCPServerSocket, (SOCKADDR*)&TCPServerSocketAddr, sizeof(TCPServerSocketAddr));
+	//mysql 에도 bind 라는 api 가 있기때문에 ::bind 를 쓰면 소켓bind 를 사용한다.
+	Result = ::bind(TCPServerSocket, (SOCKADDR*)&TCPServerSocketAddr, sizeof(TCPServerSocketAddr));
 	if (Result == SOCKET_ERROR) { cout << "Can't bind" << GetLastError(); return -1; }
 
 	//server 열기
@@ -119,17 +189,29 @@ int main()
 								cout << "IP : " << data.IP << endl;
 
 								//20230426 DB연결
-								
-
-
+								cout << "----------DBInfo----------" << endl;
+								SendToDB(DB_Statement, data.IP, data.ServerPort, data.PlayerNum);
 							}
 							//20230426 받은 데이터 : 클라
 							else
 							{
-								//1. db에서 포트번호랑 ip 받기
-								//2. 받은 정보를 클라에 넘겨주기
 								cout << "----------ClientServer----------" << endl;
-								cout << "Client!" << endl;
+								
+								//1. db에서 포트번호랑 ip 받기
+								ReceiveFromDB(DB_Statement, DB_ResultSet);
+								string IP;
+								int ServerPort;
+								while (DB_ResultSet->next())
+								{
+									IP = DB_ResultSet->getString("ip_address");
+									ServerPort = DB_ResultSet->getInt("port_number");
+								}
+								DBInfoData DBData;
+								//2. 받은 정보를 클라에 넘겨주기
+								char DBBuffer[1024] = { 0, };
+								memcpy(&DBData, DBBuffer, sizeof(DBInfoData));
+								int bytesSent = 0;
+								send(TCPServerSocket, DBBuffer, sizeof(DBData), bytesSent);
 							}
 						}
 					}
@@ -143,3 +225,4 @@ int main()
 
 	return 0;
 }
+
