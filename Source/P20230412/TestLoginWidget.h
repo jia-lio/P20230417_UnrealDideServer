@@ -4,6 +4,8 @@
 #include "Blueprint/UserWidget.h"
 
 #include "Components/EditableText.h"
+#include "Components/Button.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Json.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
@@ -14,22 +16,42 @@
 UCLASS()
 class P20230412_API UTestLoginWidget : public UUserWidget
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	class UEditabletext* ID;
-	class UEditabletext* Pass;
+    UPROPERTY(BlueprintReadWrite)
+        UEditableText* Id;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString ID_UMG;
+    UPROPERTY(BlueprintReadWrite)
+        UEditableText* Password;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString Pass_UMG;
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+        FString FID;
 
-	UFUNCTION(BlueprintCallable)
-	void OnLoginButtonClicked();
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+        FString FPassword;
 
-	UFUNCTION(BlueprintCallable)
-	void TestPass();
+    UFUNCTION(BlueprintCallable)
+        void OnLoginButtonClicked();
+
+    UFUNCTION(BlueprintCallable)
+        void OnCreateSignUpButtonClicked();
+
+    UFUNCTION(BlueprintCallable)
+        void OnSignUpButtonClicked();
+
+    UFUNCTION(BlueprintCallable)
+        void OnBackButtonClicked();
+
+
+
+    void NativeConstruct(); //widget beginplay
+    //wepserver 요청보내주기
+    void HandleHttpRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
+
+
+
+
+
 
 };

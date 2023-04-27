@@ -6,8 +6,10 @@
 #include <WinSock2.h>
 //---C++
 #include <iostream>
+#include <mysql.h>
 //---Plugin Library
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "libmysql.lib")
 
 using namespace std;
 
@@ -22,7 +24,14 @@ struct MyData
 
 int main()
 {
-	WSAData wsaData;
+	//---MySQL
+	MYSQL mysql;
+	mysql_init(&mysql);
+	if(!mysql_real_connect(&mysql, "192.168.0.15:3306", "sihoon", "qwer1234",)
+
+
+	//---WinSock
+	//WSAData wsaData;
 
 	int Result = WSAStartup(MAKEWORD(2, 2), &wsaData);		//winsock 초기화
 	if (Result != 0) { cout << "WinSock2 Error"; return -1; }	//초기화 안되면 에러처리
@@ -104,6 +113,7 @@ int main()
 								DediServerBuffer[DediServerRecvBytes] = '\0';	//버퍼의 마지막에 null추가
 								MyData data;
 								memcpy(&data, DediServerBuffer, sizeof(MyData));
+								cout << "----------DediServer----------" << endl;
 								cout << "PlayerNum : " << data.PlayerNum << endl;
 								cout << "ServerPort : " << data.ServerPort << endl;
 								cout << "IP : " << data.IP << endl;
@@ -118,7 +128,8 @@ int main()
 							{
 								//1. db에서 포트번호랑 ip 받기
 								//2. 받은 정보를 클라에 넘겨주기
-
+								cout << "----------ClientServer----------" << endl;
+								cout << "Client!" << endl;
 							}
 						}
 					}

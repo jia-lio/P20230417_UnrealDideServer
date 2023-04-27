@@ -31,6 +31,6 @@ private:
 	class FRunnableThread* thread;
 
 	bool bRunThread = false;
-	bool bTest = false;
+	bool bOneDediTCPInfo = false;
 };
  

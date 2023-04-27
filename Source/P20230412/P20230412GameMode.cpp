@@ -41,14 +41,12 @@ void AP20230412GameMode::PostLogin(APlayerController* NewPlayer)
 	InforThread();
 }
 
-void AP20230412GameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AP20230412GameMode::Logout(AController* Exiting)
 {
-	UE_LOG(LogTemp, Warning, TEXT("서버닫는다"));
+	Super::Logout(Exiting);
 
-	Super::EndPlay(EndPlayReason);
-
-	
-}
+	InforThread();
+} 
 
 void AP20230412GameMode::InforThread()
 {

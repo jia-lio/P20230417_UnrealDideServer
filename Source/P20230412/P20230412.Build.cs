@@ -15,7 +15,7 @@ public class P20230412 : ModuleRules
 		{ 
 			"Core", "CoreUObject", "Engine", "InputCore", 
 			"HeadMountedDisplay", "EnhancedInput", "HTTP",
-            "Sockets", "Networking", "UMG"
+            "Sockets", "Networking", "UMG" , "Json","JsonUtilities"
 
         });
 

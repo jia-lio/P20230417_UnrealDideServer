@@ -17,8 +17,8 @@ public:
 	virtual void InitGameState() override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	virtual void Logout(AController* Exiting) override;
+	 
 	void InforThread();
 
 };

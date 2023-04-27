@@ -15,6 +15,10 @@ public:
 	virtual void StartPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
-	
+	void ClientTCPInfo();
+
+private:
+	TSharedPtr<FInternetAddr> ClientAddress;
+	class FSocket* ClientSocket;
 
 };

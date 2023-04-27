@@ -80,9 +80,9 @@ uint32 FTestThread::Run()
 		//	bRunThread = false;
 		//}
 
-		bTest = UUSingleton::GetInstance()->GetBool();
+		bOneDediTCPInfo = UUSingleton::GetInstance()->GetBool();
 
-		if (bTest)
+		if (bOneDediTCPInfo)
 		{
 			//20230424 받아온 메세지를 Mydata 구조체에 저장하고 구조체를 전송
 			MyData data;
@@ -105,7 +105,7 @@ uint32 FTestThread::Run()
 				DediServerSocket->Send(buffer, sizeof(MyData), bytesSent);
 				
 				UUSingleton::GetInstance()->SerBool(false);
-				bTest = false;
+				bOneDediTCPInfo = false;
 			}
 
 			FPlatformProcess::Sleep(0.1f);	//스레드를 잠시 멈춘다
