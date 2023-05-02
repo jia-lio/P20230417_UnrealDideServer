@@ -3,6 +3,7 @@
 #include "TestPlayerController.h"
 #include "P20230412Character.h"
 #include "TestLoginWidget.h"
+#include "IPAddress.h"
 
 //---TCP
 #include "Sockets.h"
@@ -77,7 +78,7 @@ void ALoginGameMode::ClientTCPInfo()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Client : TCP서버에 못드루갓다"));
 	}
-	
+
 	int MyClientServer = 2;
 	uint8_t buffer[sizeof(int)];
 	memcpy(buffer, &MyClientServer, sizeof(int));
@@ -89,23 +90,49 @@ void ALoginGameMode::ClientTCPInfo()
 	}
 
 
-	//아래부터 멈추는듯? 
 	struct ServerData
 	{
 		uint16_t ServerPort;
-		FString IP;
+		char IP[16];
 	};
 	ServerData SData;
 	uint8_t DBBuffer[1024] = { 0, };
 	int32 bytes = 0;
-	if (ClientSocket->Recv(DBBuffer, sizeof(DBBuffer), bytes))
-	{
-		memcpy(&SData, DBBuffer, sizeof(ServerData));
-		//UE_LOG(LogTemp, Warning, TEXT("Client Port : %d"), SData.IP);
-		//UE_LOG(LogTemp, Warning, TEXT("Client IP : %s"), SData.ServerPort);
+	int ClientServerRecvBytes = 0;
 
-		//FString ServerAddress = "127.0.0.1:7777";	//주소
-		GetWorld()->GetFirstPlayerController()->ClientTravel(SData.IP, TRAVEL_Absolute);
+	UE_LOG(LogTemp, Warning, TEXT("TCP DB Data...."));
+
+	if (ClientSocket->Wait(ESocketWaitConditions::WaitForRead, FTimespan::FromSeconds(5)))
+	{
+		ClientServerRecvBytes = ClientSocket->Recv(DBBuffer, sizeof(DBBuffer), bytes);
+
+		if (ClientServerRecvBytes < 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Error"));
+		}
+		else if (ClientSocket == 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Data"));
+		}
+		else
+		{
+			//DBBuffer[ClientServerRecvBytes] = '\0';
+			UE_LOG(LogTemp, Warning, TEXT("In Data"));
+			memcpy(&SData, DBBuffer, sizeof(ServerData));
+		
+			UE_LOG(LogTemp, Warning, TEXT("%d"), SData.ServerPort);
+			FString str(SData.IP);
+			str += ":";
+			str += FString::FromInt(SData.ServerPort);
+
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
+
+			GetWorld()->GetFirstPlayerController()->ClientTravel(str, TRAVEL_Absolute);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No"));
 	}
 
 

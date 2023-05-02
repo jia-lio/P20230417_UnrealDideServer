@@ -25,6 +25,7 @@ sql::Statement* DB_Statement = nullptr;						//MySQL 데이터베이스에 대�
 sql::PreparedStatement* DB_PreparedStatement = nullptr;		//MySQL 데이터베이스에 미리 컴파일된 SQL 을 실행하는데 사용
 sql::ResultSet* DB_ResultSet = nullptr;						//MySQL 데이터베이스에서 반환된 결과 집합
 
+const int MAXPlayer = 2;		//데디서버에 들어갈 수 있는 최대 플레이어 수
 
 #pragma pack(push, 1)
 struct MyData
@@ -40,6 +41,15 @@ struct DBInfoData
 {
 	uint16_t ServerPort;
 	char IP[16];
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct DBDatas
+{
+	uint16_t ServerPort;
+	char IP[16];
+	uint16_t ServerPlayer;
 };
 #pragma pack(pop)
 
@@ -199,19 +209,90 @@ int main()
 								
 								//1. db에서 포트번호랑 ip 받기
 								ReceiveFromDB(DB_Statement, DB_ResultSet);
-								string IP;
-								int ServerPort;
+								DBInfoData DBData;
+								memset(&DBData, 0, sizeof(DBData));
+								//20230502
+								DBDatas dbDatas[10];
+								memset(&dbDatas, 0, sizeof(dbDatas));
+
+								int k = 0;
 								while (DB_ResultSet->next())
 								{
-									IP = DB_ResultSet->getString("ip_address");
-									ServerPort = DB_ResultSet->getInt("port_number");
+									//20230502
+									strncpy(dbDatas[k].IP, DB_ResultSet->getString("ip_address").c_str(), sizeof(dbDatas[k].IP));
+									dbDatas[k].ServerPort = DB_ResultSet->getInt("port_number");
+									dbDatas[k].ServerPlayer = DB_ResultSet->getInt("player_number");
+									k++;
 								}
-								DBInfoData DBData;
-								//2. 받은 정보를 클라에 넘겨주기
-								char DBBuffer[1024] = { 0, };
-								memcpy(&DBData, DBBuffer, sizeof(DBInfoData));
-								int bytesSent = 0;
-								send(TCPServerSocket, DBBuffer, sizeof(DBData), bytesSent);
+								//cout 
+								for (int n = 0; n < 4; n++)
+								{
+									cout << "DB------------------------------" << endl;
+									cout << dbDatas[n].IP << endl;
+									cout << dbDatas[n].ServerPort << endl;
+									cout << dbDatas[n].ServerPlayer << endl;
+									cout << "--------------------------------" << endl;
+								}
+
+								//20230502
+								for(int j = 0; j < 10; j++)
+								{
+									//조건1. 서버가 맨처음 7777 이어야할것
+									//조건2. 7777서버가 풀일때 7778 서버로 들어가야할것
+									if (dbDatas[j].ServerPort == 7777)
+									{
+										if (dbDatas[j].ServerPlayer <= MAXPlayer)
+										{
+											strncpy(DBData.IP, dbDatas[j].IP, sizeof(DBData.IP));
+											cout << DBData.IP << endl;
+											DBData.ServerPort = dbDatas[j].ServerPort;
+											cout << DBData.ServerPort << endl;
+
+											//2. 받은 정보를 클라에 넘겨주기
+											char DBBuffer[1024] = { 0, };
+											//데이터 복사
+											memcpy(DBBuffer, &DBData, sizeof(DBInfoData));
+											int bytesSent = 0;
+											cout << "DB > Client" << endl;
+											//데이터 넘겨주기
+											send(ReadSockets.fd_array[i], DBBuffer, sizeof(DBData), bytesSent);
+											cout << "------------------------------------" << endl;
+											break;
+										}
+										else 
+										{
+											cout << "1 else" << endl;
+										}
+									}
+									else if(dbDatas[j].ServerPort == 7778)
+									{
+										if (dbDatas[j].ServerPlayer <= MAXPlayer)
+										{
+											strncpy(DBData.IP, dbDatas[j].IP, sizeof(DBData.IP));
+											cout << DBData.IP << endl;
+											DBData.ServerPort = dbDatas[j].ServerPort;
+											cout << DBData.ServerPort << endl;
+
+											//2. 받은 정보를 클라에 넘겨주기
+											char DBBuffer[1024] = { 0, };
+											//데이터 복사
+											memcpy(DBBuffer, &DBData, sizeof(DBInfoData));
+
+											//--
+											int bytesSent = 0;
+											cout << "DB > Client" << endl;
+											//데이터 넘겨주기
+											send(ReadSockets.fd_array[i], DBBuffer, sizeof(DBData), bytesSent);
+											cout << "------------------------------------" << endl;
+											break;
+										}
+										else
+										{
+											cout << "2 else" << endl;
+										}
+									}
+								}
+
 							}
 						}
 					}
