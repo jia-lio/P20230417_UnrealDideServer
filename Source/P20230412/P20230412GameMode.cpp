@@ -9,6 +9,8 @@
 #include "USingleton.h"
 #include "SocketSubsystem.h"
 #include "Sockets.h"
+#include "PlayerVoiceChatActor.h"
+
 
 #include <string>
 
@@ -39,6 +41,21 @@ void AP20230412GameMode::PostLogin(APlayerController* NewPlayer)
 	UE_LOG(LogTemp, Warning, TEXT("클라이언트가 드루왓다"));
 
 	InforThread();
+
+	//voice
+	FActorSpawnParameters paramSpawn;
+	paramSpawn.Owner = NewPlayer;
+	APlayerVoiceChatActor* VoiceChatActor = GetWorld()->SpawnActor<APlayerVoiceChatActor>(FVector(0, 0, 0), FRotator(0, 0, 0), paramSpawn);
+
+	if (VoiceChatActor != NULL)
+	{
+		VoiceChatActor->ServerSetAttenuation(true, FString("/Script/Engine.SoundAttenuation'/Game/NewSoundAttenuation.NewSoundAttenuation'"));
+		VoiceChatActor->ServerPerformAntiCheat = false;
+		VoiceChatActor->AntiCheatAllowUseProximity = true;
+		VoiceChatActor->AntiCheatAllowUseGlobal = true;
+		VoiceChatActor->AntiCheatMaxProximityRange = 1000.0f;
+		VoiceChatActor->ServerSetAllowUseGlobal(true);
+	}
 }
 
 void AP20230412GameMode::Logout(AController* Exiting)

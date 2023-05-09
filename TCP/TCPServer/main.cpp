@@ -53,15 +53,16 @@ struct DBDatas
 };
 #pragma pack(pop)
 
-void SendToDB(sql::Statement* _statement, string IPAddr, int PortNum, int PlayerNum)
+void SendToDB(sql::Statement* _statement, string IPAddr, int PortNum, int PlayerNum, int Server_State)
 {
 	// DB에 입력될 데이터 값
 	string IP = IPAddr;
 	string stringPort = to_string(PortNum);
 	string stringPlayerNumber = to_string(PlayerNum);
+	string server_state = to_string(Server_State);
 
 	// 쿼리문 세팅
-	string query = "INSERT INTO server_list (ip_address, port_number, player_number) VALUES ('" + IP + "', " + stringPort + ", " + stringPlayerNumber + ") ON DUPLICATE KEY UPDATE player_number=" + stringPlayerNumber + ";";
+	string query = "INSERT INTO server_list (ip_address, port_number, player_number, server_state) VALUES ('" + IP + "', " + stringPort + ", " + stringPlayerNumber + ", " + server_state + ") ON DUPLICATE KEY UPDATE player_number=" + stringPlayerNumber + ";";
 
 	try
 	{
@@ -200,7 +201,7 @@ int main()
 
 								//20230426 DB연결
 								cout << "----------DBInfo----------" << endl;
-								SendToDB(DB_Statement, data.IP, data.ServerPort, data.PlayerNum);
+								SendToDB(DB_Statement, data.IP, data.ServerPort, data.PlayerNum, 1);
 							}
 							//20230426 받은 데이터 : 클라
 							else

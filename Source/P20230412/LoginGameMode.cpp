@@ -63,7 +63,7 @@ void ALoginGameMode::ClientTCPInfo()
 	ClientSocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("DefaultSocket"), false);
 	ClientAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
-	FString IP = TEXT("127.0.0.1");	//tcp ip
+	FString IP = TEXT("192.168.0.20");	//tcp ip
 	int32 port = 10000;	//tcp port
 	FIPv4Address TemporaryAddr;		//임시 저장소
 	FIPv4Address::Parse(IP, TemporaryAddr); //ip를 temporaryAddr에 변환해서 넣고

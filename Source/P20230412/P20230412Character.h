@@ -37,9 +37,18 @@ class AP20230412Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	/** Voice Chat Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* VoiceAction;
+
+	//voice image
+	UPROPERTY(VisibleAnywhere, Category = UI)
+		class UWidgetComponent* VoiceWidget;
+
 public:
 	AP20230412Character();
 	
+	bool bVoiceChat = false;
 
 protected:
 
@@ -48,7 +57,10 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+	
+	//voice input
+	void VoiceStart();
+	void VoiceStop();
 
 protected:
 	// APawn interface
@@ -62,5 +74,8 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//Voice Setting Class
+	class UUniversalVoiceChat* VoiceSetting;
 };
 

@@ -22,6 +22,3 @@ public:
 	void InforThread();
 
 };
-
-
-

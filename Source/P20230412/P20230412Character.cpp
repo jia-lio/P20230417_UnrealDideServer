@@ -9,6 +9,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+//20230509
+#include "PlayerVoiceChatActor.h"
+#include "Components/WidgetComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -18,7 +21,7 @@ AP20230412Character::AP20230412Character()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -49,6 +52,13 @@ AP20230412Character::AP20230412Character()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	//20230509 voice widget component add
+	VoiceWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("VoiceWidget"));
+	VoiceWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	VoiceWidget->SetupAttachment(GetMesh());
+	VoiceWidget->SetRelativeLocation(FVector(0, 0, 120.0f));
+	VoiceWidget->SetVisibility(false);
 }
 
 void AP20230412Character::BeginPlay()
@@ -84,6 +94,9 @@ void AP20230412Character::SetupPlayerInputComponent(class UInputComponent* Playe
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AP20230412Character::Look);
 
+		//Voice Chat
+		EnhancedInputComponent->BindAction(VoiceAction, ETriggerEvent::Triggered, this, &AP20230412Character::VoiceStart);
+		EnhancedInputComponent->BindAction(VoiceAction, ETriggerEvent::Completed, this, &AP20230412Character::VoiceStop);
 	}
 
 }
@@ -122,6 +135,24 @@ void AP20230412Character::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AP20230412Character::VoiceStart()
+{
+	bVoiceChat = true;
+
+	VoiceSetting->VoiceChatWasInitAudioVoiceChatQuality();
+	VoiceSetting->VoiceChatInitAudioVoiceChatQuality();
+	VoiceSetting->VoiceChatStartSpeak(false, true, 0, true, 1000.0f);	//기본설정
+	VoiceWidget->SetVisibility(true);
+}
+
+void AP20230412Character::VoiceStop()
+{
+	bVoiceChat = false;
+
+	VoiceSetting->VoiceChatStopSpeak();
+	VoiceWidget->SetVisibility(false);
 }
 
 
