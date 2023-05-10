@@ -74,6 +74,11 @@ void AP20230412Character::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	VoiceSetting->VoiceChatAskMicrophonePermission();
+	VoiceSetting->VoiceChatWasInitAudioVoiceChatQuality();
+	VoiceSetting->VoiceChatInitAudioVoiceChatQuality();
+	VoiceSetting->VoiceChatSetMicrophoneVolume(50.0f);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -141,9 +146,7 @@ void AP20230412Character::VoiceStart()
 {
 	bVoiceChat = true;
 
-	VoiceSetting->VoiceChatWasInitAudioVoiceChatQuality();
-	VoiceSetting->VoiceChatInitAudioVoiceChatQuality();
-	VoiceSetting->VoiceChatStartSpeak(false, true, 0, true, 1000.0f);	//기본설정
+	VoiceSetting->VoiceChatStartSpeak(false, true, 0, true, 1000);
 	VoiceWidget->SetVisibility(true);
 }
 
